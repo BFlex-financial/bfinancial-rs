@@ -2,7 +2,7 @@ use reqwest;
 use serde_json::Value;
 
 pub mod models;
-use models::client::payment::Payment;
+use models::client::payment::PaymentCreate;
 
 
 #[derive(Clone, Debug)]
@@ -42,36 +42,35 @@ impl Payments {
     }
   }
 
-  pub async fn new(&self, data: Payment) -> Result<models::server::payment::Response, String> {
+  pub async fn new(&self, data: PaymentCreate) -> Result<models::server::payment::Response, String> {
     let client = reqwest::Client::new();
 
+    let k = data.clone();
+    dbg!(k.clone());
+    let res = client.post(format!("{}/payment/create", self.__api))
+          .header("Authorization-key", self.__auth.clone())
+          .header("Content-Type", "application/json")
+          .body(
+            serde_json::to_string(&k).unwrap()
+          )
+          .send()
+          .await
+          .unwrap();
 
+        let response: Value = res.json::<Value>().await.unwrap();
+      
+        match response.clone().get("error") {
+          Some(error) => {
+            return Err(error.as_str().unwrap().to_string());
+          } 
+          None => {}
+        }
     match data {
       
       /*
         Payment with credit/debit card
       */
-      Payment::Card(card) => {
-          let res = client.post(format!("{}/payment/create", self.__api))
-            .header("Authorization-key", self.__auth.clone())
-            .header("Content-Type", "application/json")
-            .body(
-              serde_json::to_string(&card).unwrap()
-            )
-            .send()
-            .await
-              .unwrap();
-
-          let response: Value = res.json::<Value>().await.unwrap();
-
-          match response.clone().get("error") {
-            Some(error) => {
-              return Err(error.as_str().unwrap().to_string());
-            } 
-            None => {}
-          } 
-
-            
+      PaymentCreate::Card(card) => {
           Ok(models::server::payment::Response::Card(
             models::server::payment::Card {
               payment_id: 
@@ -106,27 +105,7 @@ impl Payments {
       /*
         Payment with PIX
       */
-      Payment::Pix(pix) => {
-        let res = client.post(format!("{}/payment/create", self.__api))
-          .header("Authorization-key", self.__auth.clone())
-          .header("Content-Type", "application/json")
-          .body(
-            serde_json::to_string(&pix).unwrap()
-          )
-          .send()
-          .await
-          .unwrap();
-
-        dbg!(&res);
-        let response: Value = res.json::<Value>().await.unwrap();
-      
-        match response.clone().get("error") {
-          Some(error) => {
-            return Err(error.as_str().unwrap().to_string());
-          } 
-          None => {}
-        }
-
+      PaymentCreate::Pix(pix) => {
         Ok(
           models::server::payment::Response::Pix(
             models::server::payment::Pix {
@@ -136,9 +115,9 @@ impl Payments {
                         .unwrap()
                         .get("payment_id")
                         .unwrap()
-                        .as_str()
+                        .as_i64()
                         .unwrap()
-                        .into(),
+                        .to_string(),
               
               qr_code: 
                       response.clone()
