@@ -1,6 +1,6 @@
-use serde::{Serialize, Deserialize};
+use serde::{ Serialize, Deserialize };
 
-#[derive(Clone,Deserialize, Serialize, Debug)]
+#[derive(Clone, Deserialize, Serialize, Debug)]
 pub struct PixCreate {
   pub amount: f64,
   pub payer_email: String
@@ -16,14 +16,14 @@ pub struct CardCreate {
 }
 
 
-#[derive(Clone,Deserialize, Serialize, Debug)]
+#[derive(Clone, Deserialize, Serialize, Debug)]
 #[serde(tag = "method")]
 pub enum PaymentCreate {
   Card(CardCreate),
   Pix(PixCreate)
 }
 
-#[derive(Clone,Deserialize, Serialize, Debug)]
+#[derive(Clone, Deserialize, Serialize, Debug)]
 pub struct PaymentReceived {
   pub payment_id: usize
 }

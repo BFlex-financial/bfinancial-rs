@@ -4,7 +4,6 @@ use serde_json::Value;
 pub mod models;
 use models::client::payment::PaymentCreate;
 
-
 #[derive(Clone, Debug)]
 pub struct Client {
   pub auth: String,
@@ -12,14 +11,13 @@ pub struct Client {
 }
 
 impl Client {
-  pub fn start(auth: &'static str) -> Self {
+  pub fn login(auth: &'static str) -> Self {
     let payments = Payments::call(auth.into());
     
     Self {
       auth: auth.into(), payments
     }
   }
-  
 }
 
 /*
@@ -42,36 +40,39 @@ impl Payments {
     }
   }
 
-  pub async fn new(&self, data: PaymentCreate) -> Result<models::server::payment::Response, String> {
+  pub async fn create(&self, data: PaymentCreate) -> Result<models::server::payment::Response, String> {
     let client = reqwest::Client::new();
 
-    let k = data.clone();
-    dbg!(k.clone());
-    let res = client.post(format!("{}/payment/create", self.__api))
-          .header("Authorization-key", self.__auth.clone())
-          .header("Content-Type", "application/json")
-          .body(
-            serde_json::to_string(&k).unwrap()
-          )
-          .send()
-          .await
-          .unwrap();
+    let res = 
+      client
+        .post(format!("{}/payment/create", self.__api))
+        .header("Authorization-key", self.__auth.clone())
+        .header("Content-Type", "application/json")
+        .body(
+          serde_json::to_string(&data.clone()).unwrap()
+        )
+        .send()
+        .await
+        .unwrap();
 
-        let response: Value = res.json::<Value>().await.unwrap();
-      
-        match response.clone().get("error") {
-          Some(error) => {
-            return Err(error.as_str().unwrap().to_string());
-          } 
-          None => {}
-        }
+    let response: Value = res.json::<Value>().await.unwrap();
+  
+    match response.clone().get("error") {
+      Some(error) => {
+        return Err(error.as_str().unwrap().to_string());
+      } 
+      None => {}
+    }
+
     match data {
       
       /*
         Payment with credit/debit card
       */
-      PaymentCreate::Card(card) => {
-          Ok(models::server::payment::Response::Card(
+
+      PaymentCreate::Card(_) => {
+        Ok(
+          models::server::payment::Response::Card(
             models::server::payment::Card {
               payment_id: 
                         response.clone()
@@ -98,14 +99,16 @@ impl Payments {
                         .unwrap()
                         .as_f64()
                         .unwrap()
-            })
+            }
           )
-        },
+        )
+      },
 
       /*
         Payment with PIX
       */
-      PaymentCreate::Pix(pix) => {
+
+      PaymentCreate::Pix(_) => {
         Ok(
           models::server::payment::Response::Pix(
             models::server::payment::Pix {
@@ -142,8 +145,9 @@ impl Payments {
                       .as_str()
                       .unwrap()
                       .into(),
-            })
+            }
           )
+        )
       }
     }
   }
