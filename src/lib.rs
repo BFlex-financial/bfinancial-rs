@@ -4,6 +4,7 @@ use serde_json::Value;
 pub mod models;
 use models::client::payment::PaymentCreate;
 
+
 #[derive(Clone, Debug)]
 pub struct Client {
   pub auth: String,
@@ -18,6 +19,7 @@ impl Client {
       auth: auth.into(), payments
     }
   }
+  
 }
 
 /*
@@ -43,36 +45,32 @@ impl Payments {
   pub async fn create(&self, data: PaymentCreate) -> Result<models::server::payment::Response, String> {
     let client = reqwest::Client::new();
 
-    let res = 
-      client
-        .post(format!("{}/payment/create", self.__api))
-        .header("Authorization-key", self.__auth.clone())
-        .header("Content-Type", "application/json")
-        .body(
-          serde_json::to_string(&data.clone()).unwrap()
-        )
-        .send()
-        .await
-        .unwrap();
+
+    let res = client.post(format!("{}/payment/create", self.__api))
+          .header("Authorization-key", self.__auth.clone())
+          .header("Content-Type", "application/json")
+          .body(
+            serde_json::to_string(&data).unwrap()
+          )
+          .send()
+          .await
+          .unwrap();
 
     let response: Value = res.json::<Value>().await.unwrap();
-  
+      
     match response.clone().get("error") {
-      Some(error) => {
-        return Err(error.as_str().unwrap().to_string());
-      } 
-      None => {}
+        Some(error) => {
+          return Err(error.as_str().unwrap().to_string());
+        } 
+        None => {}
     }
-
     match data {
       
       /*
         Payment with credit/debit card
       */
-
       PaymentCreate::Card(_) => {
-        Ok(
-          models::server::payment::Response::Card(
+          Ok(models::server::payment::Response::Card(
             models::server::payment::Card {
               payment_id: 
                         response.clone()
@@ -80,9 +78,8 @@ impl Payments {
                         .unwrap()
                         .get("payment_id")
                         .unwrap()
-                        .as_str()
-                        .unwrap()
-                        .into(),
+                        .as_number()
+                        .unwrap().clone(),
             total_amount: 
                         response.clone()
                         .get("data")
@@ -99,15 +96,13 @@ impl Payments {
                         .unwrap()
                         .as_f64()
                         .unwrap()
-            }
+            })
           )
-        )
-      },
+        },
 
       /*
         Payment with PIX
       */
-
       PaymentCreate::Pix(_) => {
         Ok(
           models::server::payment::Response::Pix(
@@ -145,9 +140,8 @@ impl Payments {
                       .as_str()
                       .unwrap()
                       .into(),
-            }
+            })
           )
-        )
       }
     }
   }

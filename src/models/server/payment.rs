@@ -1,3 +1,5 @@
+use serde_json::Number;
+
 #[derive(Clone, Debug, PartialEq)]
 pub struct Pix {
   pub payment_id: String,
@@ -7,7 +9,7 @@ pub struct Pix {
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct Card {
-  pub payment_id: String,
+  pub payment_id: Number,
   pub total_amount: f64,
   pub increase: f64
 }
