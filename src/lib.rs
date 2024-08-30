@@ -79,9 +79,9 @@ impl Payments {
                           .unwrap()
                           .get("payment_id")
                           .unwrap()
-                          .as_str()
+                          .as_i64()
                           .unwrap()
-                          .into(),
+                          .to_string(),
               total_amount: 
                           response.clone()
                           .get("data")
