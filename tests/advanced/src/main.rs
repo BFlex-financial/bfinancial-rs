@@ -30,7 +30,7 @@ async fn test_card(){
         payer_cpf: "12345678909".into(),
         payer_name: "test user".into(),
 
-        // Card information
+        // Card informations
         expiration_month: 11,
         expiration_year: 2025,
         number: "5031433215406351".into(),
