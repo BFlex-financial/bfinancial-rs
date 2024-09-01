@@ -13,7 +13,7 @@ pub struct Client {
 
 impl Client {
   pub fn login(auth: &'static str) -> Self {
-    let payments = Payments::call(auth.into());
+    let payments = Payments::call(format!("Bearer {auth}"));
     
     Self {
       auth: auth.into(), payments
