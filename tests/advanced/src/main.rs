@@ -1,5 +1,5 @@
 use tokio;
-use bfinancial_rs::{ Client, models::client::payment::{self, PaymentCreate} };
+use bfinancial_rs::{ Client, models::client::payment::{self, PaymentCreate}, models::server::payment::{Pix, Card} };
 
 async fn test_pix(){
     let client = Client::login("admin");
@@ -13,7 +13,7 @@ async fn test_pix(){
     })).await;
 
     match payment_data {
-        Ok(pix) => println!("{:#?}", pix),
+        Ok(pix) => println!("{:#?}", pix.access::<Pix>().unwrap()),
         Err(fail) => println!("Error returned when generating payment: {}", fail)
     }
 }
@@ -38,7 +38,7 @@ async fn test_card(){
     })).await;
 
     match payment_data {
-        Ok(pix) => println!("{:#?}", pix),
+        Ok(card) => println!("{:#?}", card.access::<Card>().unwrap()),
         Err(fail) => println!("Error returned when generating payment: {}", fail)
     }
 }
