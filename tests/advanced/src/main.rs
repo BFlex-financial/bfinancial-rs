@@ -5,7 +5,10 @@ async fn test_pix(){
     let client = Client::login("admin");
     let payments = client.payments;
     let payment_data = payments.create(PaymentCreate::Pix(payment::PixCreate {
+        // Payment amount
         amount: 22.0,
+
+        // Payer information
         payer_email: "test@gmail.com".into()
     })).await;
 
