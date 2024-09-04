@@ -1,3 +1,7 @@
+/**
+ * By. Lucas Silveira <contato.lucasdwbfff@gmail.com>
+ */
+
 use reqwest;
 use serde_json::Value;
 
