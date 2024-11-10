@@ -56,3 +56,43 @@ async fn main() {
   test_card().await;
 }
 ```
+
+#
+
+## Verificação do status do pagamento
+
+A verificação do check funciona da seguinte forma:
+Se quando checkado, está PENDENTE, o pagamento ficará verificando até haver qualquer mudança nos status.
+Quando status transacionar para qualquer outro, teremos algum tipo de retorno.
+
+Se for alterado para o status esperado pelo CHECK, você receberá um Ok da SDK.
+
+Se for alterado para qualquer outro status, SE NÃO o esperado, você receberá algum erro no Err.
+
+```rs
+use tokio;
+use bfinancial_rs::{ models::{client::payment::{self, PaymentCreate}, server::payment::Pix}, Client};
+
+#[tokio::main]
+async fn main() {
+  let client = Client::login("admin");
+  let payments = &client.payments;
+  let payment_data = payments.create(PaymentCreate::Pix(payment::PixCreate {
+    amount: 22.0,
+    payer_email: "test@gmail.com".into(),
+    payer_cpf: "12345678909".into()
+  })).await;
+
+  if let Err(fail) = &payment_data {
+    println!("Error returned when generating payment: {}", fail);
+  }
+
+  let payment = payment_data.unwrap();
+  match
+    payment.check((client, "approved")).await
+  {
+    Ok(_) => println!("Payment approved"),
+    Err(msg) => println!("Ocurred a error: {msg}") 
+  }
+}
+```

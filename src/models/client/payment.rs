@@ -3,7 +3,8 @@ use serde::{ Serialize, Deserialize };
 #[derive(Clone, Deserialize, Serialize, Debug)]
 pub struct PixCreate {
   pub amount: f64,
-  pub payer_email: String
+  pub payer_email: String,
+  pub payer_cpf: String
 }
 
 #[derive(Clone, Deserialize, Serialize, Debug)]

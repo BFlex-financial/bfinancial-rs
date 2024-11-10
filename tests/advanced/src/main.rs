@@ -1,50 +1,25 @@
 use tokio;
-use bfinancial_rs::{ Client, models::client::payment::{self, PaymentCreate}, models::server::payment::{Pix, Card} };
-
-async fn test_pix(){
-    let client = Client::login("admin");
-    let payments = client.payments;
-    let payment_data = payments.create(PaymentCreate::Pix(payment::PixCreate {
-        // Payment amount
-        amount: 22.0,
-
-        // Payer information
-        payer_email: "test@gmail.com".into()
-    })).await;
-
-    match payment_data {
-        Ok(pix) => println!("{:#?}", pix.access::<Pix>().unwrap()),
-        Err(fail) => println!("Error returned when generating payment: {}", fail)
-    }
-}
-
-async fn test_card(){
-    let client = Client::login("admin");
-    let payments = client.payments;
-    let payment_data = payments.create(PaymentCreate::Card(payment::CardCreate {
-        // Payment amount
-        amount: 22.0,
-
-        // Payer informations
-        payer_email: "test@gmail.com".into(),
-        payer_cpf: "12345678909".into(),
-        payer_name: "test user".into(),
-
-        // Card informations
-        expiration_month: 11,
-        expiration_year: 2025,
-        number: "5031433215406351".into(),
-        cvv: "123".into()
-    })).await;
-
-    match payment_data {
-        Ok(card) => println!("{:#?}", card.access::<Card>().unwrap()),
-        Err(fail) => println!("Error returned when generating payment: {}", fail)
-    }
-}
+use bfinancial_rs::{ models::{client::payment::{self, PaymentCreate}, server::payment::Pix}, Client};
 
 #[tokio::main]
 async fn main() {
-    test_pix().await;
-    test_card().await;
+    let client = Client::login("admin");
+    let payments = &client.payments;
+    let payment_data = payments.create(PaymentCreate::Pix(payment::PixCreate {
+        amount: 1.0,
+        payer_email: "test@gmail.com".into(),
+        payer_cpf: "12345678910".into()
+    })).await;
+
+    if let Err(fail) = &payment_data {
+        println!("Error returned when generating payment: {}", fail);
+    }
+
+    let payment = payment_data.clone().unwrap();
+    match
+        payment.check((client, "approved")).await
+    {
+        Ok(_) => println!("Payment Aprooved"),
+        Err(msg) => println!("Ocurred a error: {msg}") 
+    }
 }
