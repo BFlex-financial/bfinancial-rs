@@ -6,8 +6,7 @@ use reqwest;
 use serde_json::Value;
 
 pub mod models;
-use models::client::payment::PaymentCreate;
-
+use models::{client::payment::PaymentCreate, server::payment::Response};
 
 #[derive(Clone, Debug)]
 pub struct Client {
@@ -16,6 +15,12 @@ pub struct Client {
 }
 
 impl Client {
+  /// # Login
+  /// 
+  /// Enter your BFlex Financial Solutions access code.
+  /// Here we will save important information about your account.
+  ///
+  /// # _DO NOT SHARE THIS KEY WITH ANYONE!_
   pub fn login(auth: &'static str) -> Self {
     let payments = Payments::call(format!("Bearer {auth}"));
     
@@ -37,7 +42,7 @@ pub struct Payments {
 }
 
 impl Payments {
-  pub fn call(auth: String) -> Payments {
+  pub(crate) fn call(auth: String) -> Payments {
     Payments {
       __api: "http://127.0.0.1:8080".into(),
       __auth: auth,
@@ -45,14 +50,33 @@ impl Payments {
     }
   }
 
-  pub async fn create(&self, data: PaymentCreate) -> Result<models::server::payment::Response, String> {
+  /// # Create payments
+  /// 
+  /// This function creates a payment using BFlex Financial Solutions
+  /// 
+  /// # Examples
+  /// 
+  /// ```rust
+  /// let payment: Result<Response, String> = payments.create(PaymentCreate::Pix(PixCreate {
+  ///   amount: 1000.00,
+  ///   payer_email: "test@gmail.com".into(),
+  ///   payer_cpf: "12345678910".into()
+  /// })).await;
+  /// 
+  /// assert!(payment, Ok(Response::Pix({ 
+  ///   payment_id: 0, 
+  ///   qr_code: String::new(),
+  ///   literal: String::new()
+  /// }));
+  /// ```
+  pub async fn create(&self, data: PaymentCreate) -> Result<Response, String> {
     let client = reqwest::Client::new();
 
     let res = client.post(format!("{}/payment/create", self.__api))
       .header("Authorization-key", self.__auth.clone())
       .header("Content-Type", "application/json")
       .body(
-      serde_json::to_string(&data).unwrap()
+        serde_json::to_string(&data).unwrap()
       )
       .send()
       .await
@@ -150,5 +174,9 @@ impl Payments {
         )
       }
     }
+  }
+
+  pub async fn obtain(id: usize) {
+
   }
 }

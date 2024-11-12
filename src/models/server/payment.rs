@@ -42,6 +42,47 @@ impl RespData for Pix {
 }
 
 impl Response {
+  /// # Access the payment
+  ///
+  /// If you have created a payment, and you know exactly
+  /// what type it is and you are sure that it does not
+  /// need verification via MATCH, you can force direct 
+  /// access with Access
+  /// 
+  /// # Exemples
+  /// 
+  /// - If you do not know what type of payment was generated (in this case PIX), you should use:
+  /// 
+  /// ```rust
+  /// // Create the payment
+  /// let payment: Result<Response, String> = payments.create(PaymentCreate::Pix(payment::PixCreate { ... })).await;
+  /// 
+  /// // Ensures that there are no errors when creating the payment
+  /// if let Err(fail) = &payment {
+  ///    println!("Error returned when generating payment: {}", fail);
+  /// }
+  /// 
+  /// // It checks the type of payment and handles it appropriately for each
+  /// match payment.unwrap() {
+  ///   Response::Pix(pix) => { ... },
+  ///   Response::Card(card) => { ... },
+  /// }
+  /// ```
+  /// 
+  /// - If you know what type of payment was generated and want to save lines of code, you should use:
+  /// 
+  /// ```rust
+  /// // Create the payment
+  /// let payment: Result<Response, String> = payments.create(PaymentCreate::Pix(payment::PixCreate { ... })).await;
+  /// 
+  /// // Ensures that there are no errors when creating the payment
+  /// if let Err(fail) = &payment {
+  ///    println!("Error returned when generating payment: {}", fail);
+  /// }
+  /// 
+  /// // Collects PIX from within the enumerator
+  /// let pix: &Pix = payment.access::<Pix>().unwrap();
+  /// ```
   pub fn access<T: 'static>(&self) -> Option<&T> {
     match self {
       Response::Card(card) => card.as_any().downcast_ref::<T>(),
@@ -49,16 +90,43 @@ impl Response {
     }
   }
 
+  /// # Check payment status
+  /// 
+  /// - This function checks the payment status in real time.
+  /// 
+  /// The system waits for any update on the payment status.
+  /// If the status changes from X to Y, an update will be reported. 
+  /// If the status is as expected, the system will return "Ok". 
+  /// If the status is different from what is expected, 
+  /// an error ("Err") will be returned.
+  /// 
+  /// # Exemple
+  /// 
+  /// ```rust
+  /// // Create the payment
+  /// let payment: Result<Response, String> = payments.create(PaymentCreate::Pix(payment::PixCreate { ... })).await;
+  /// 
+  /// // Ensures that there are no errors when creating the payment
+  /// if let Err(fail) = &payment { ... }
+  /// 
+  /// /* 
+  ///   Wait for the payment status to be updated. 
+  ///   If it is updated to `approved`, it should
+  ///   fall on Ok. If it changes to any other
+  ///   status, it should fall on Err, returning
+  ///   the status that was obtained.
+  /// */
+  /// match
+  ///   payment.check((client, "approved")).await
+  /// {
+  ///   Ok(_) => println!("Payment Aprooved"),
+  ///   Err(msg) => println!("Ocurred a error: {msg}") 
+  /// }
+  /// ```
   pub async fn check(&self, info: (Client, &'static str)) -> Result<(), String> {
     let id: String = match self {
-      Response::Card(_) => {
-        let payment = self.access::<Card>().unwrap();
-        payment.payment_id.clone()
-      },
-      Response::Pix(_) => {
-        let payment = self.access::<Pix>().unwrap();
-        payment.payment_id.clone()
-      }
+      Response::Card(payment) => payment.payment_id.clone(),
+      Response::Pix(payment) => payment.payment_id.clone()
     };
 
     let mut start: String = String::new();
@@ -80,49 +148,40 @@ impl Response {
       return Err("Payment not found".into());
     }
 
-    std::thread::spawn(move || {
-        let rt: Runtime = Runtime::new().unwrap();
-        let mut rerun: bool = true;
+    let mut rerun: bool = true;
 
-        let result = rt.block_on(async {
-          while rerun {
+    while rerun {
 
-            let client = reqwest::Client::new();
-            let res = client.get(format!("{}/payment/get", info.0.payments.__api.clone()))
-              .header("Authorization-key", info.0.payments.__auth.clone())
-              .header("Content-Type", "application/json")
-              .body(format!("{{\"payment_id\":{}}}", id))
-              .send()
-              .await
-              .unwrap();
+      let client = reqwest::Client::new();
+      let res = client.get(format!("{}/payment/get", info.0.payments.__api.clone()))
+        .header("Authorization-key", info.0.payments.__auth.clone())
+        .header("Content-Type", "application/json")
+        .body(format!("{{\"payment_id\":{}}}", id))
+        .send()
+        .await
+        .unwrap();
 
-            let response: Value = res.json::<Value>().await.unwrap();
+      let response: Value = res.json::<Value>().await.unwrap();
 
-            if let Some(error) = response.get("data").and_then(|data| data.get("error")) {
-              return Err(error.as_str().unwrap().to_string());
-            }
+      if let Some(error) = response.get("data").and_then(|data| data.get("error")) {
+        return Err(error.as_str().unwrap().to_string());
+      }
 
-            if let Some(status) = response.get("data").and_then(|data| data.get("status")) {
-              if status.as_str().unwrap() != start && status.as_str().unwrap() != info.1 {
-                return Err(format!("Received the '{}' status, but has expected '{}'.", status.as_str().unwrap(), info.1))
-              }
+      if let Some(status) = response.get("data").and_then(|data| data.get("status")) {
+        if status.as_str().unwrap() != start && status.as_str().unwrap() != info.1 {
+          return Err(format!("Received the '{}' status, but has expected '{}'.", status.as_str().unwrap(), info.1))
+        }
 
-              if status.as_str().unwrap() == info.1 {
-                rerun = false;
-              }
-            }
+        if status.as_str().unwrap() == info.1 {
+          rerun = false;
+        }
+      }
 
-            std::thread::sleep(std::time::Duration::new(5,0));
+      std::thread::sleep(std::time::Duration::new(5,0));
 
-          }
+    }
 
-          Ok(())
-        });
+    Ok(())
 
-        result
-    })
-    .join()
-    .unwrap() 
-    
   }
 }
