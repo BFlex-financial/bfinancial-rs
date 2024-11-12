@@ -1,12 +1,21 @@
-use std::{any::Any, os::windows::thread};
-use serde::de::IntoDeserializer;
+use std::any::Any;
 use serde_json::Value;
-use tokio::runtime::Runtime;
 
 use crate::Client;
 
 #[derive(Clone, Debug, PartialEq)]
+pub enum Status {
+  Reject(String),
+  Cancelled,
+  Approved,
+  Refunded,
+  Pending,
+  Uknown
+}
+
+#[derive(Clone, Debug, PartialEq)]
 pub struct Pix {
+  pub status: Status,
   pub payment_id: String,
   pub qr_code: String,
   pub literal: String
@@ -14,6 +23,7 @@ pub struct Pix {
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct Card {
+  pub status: Status,
   pub payment_id: String,
   pub total_amount: f64,
   pub increase: f64

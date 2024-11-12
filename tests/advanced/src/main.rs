@@ -16,7 +16,10 @@ async fn main() {
     }
 
     let payment = payment_data.clone().unwrap();
-    println!("Pix copia e cola: {}", payment.access::<Pix>().unwrap().literal);
+    let pix: &Pix = payment.access::<Pix>().unwrap();
+    println!("Pix copia e cola: {}", pix.literal);
+    let collected = payments.obtain(&pix.payment_id).await.unwrap();
+    println!("{:#?}", collected);
     match
         payment.check((client, "approved")).await
     {
