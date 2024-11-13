@@ -6,7 +6,7 @@ async fn main() {
     let client = Client::login("admin");
     let payments = &client.payments;
     let payment_data = payments.create(PaymentCreate::Pix(payment::PixCreate {
-        amount: 1.0,
+        amount: 0.02,
         payer_email: "test@gmail.com".into(),
         payer_cpf: "12345678910".into()
     })).await;
@@ -23,7 +23,7 @@ async fn main() {
     match
         payment.check((client, "approved")).await
     {
-        Ok(_) => println!("Payment Aprooved"),
+        Ok(_) => println!("Payment approved"),
         Err(msg) => println!("Ocurred a error: {msg}") 
     }
 }

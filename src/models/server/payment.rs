@@ -129,7 +129,7 @@ impl Response {
   /// match
   ///   payment.check((client, "approved")).await
   /// {
-  ///   Ok(_) => println!("Payment Aprooved"),
+  ///   Ok(_) => println!("Payment approved"),
   ///   Err(msg) => println!("Ocurred a error: {msg}") 
   /// }
   /// ```
