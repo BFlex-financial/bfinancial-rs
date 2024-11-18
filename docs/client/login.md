@@ -1,4 +1,4 @@
-# Login - Fn(_: &str)
+# Login
 
 Enter your BFlex Financial Solutions access code.
 
