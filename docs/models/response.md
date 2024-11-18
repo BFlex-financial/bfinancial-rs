@@ -9,4 +9,4 @@
 
 ### - pub fn [access](./response/access.md)`<T: 'static>`(&self) -> Option<&T>
 
-### - pub fn [check](./response/check.md)(&self, `info`: ([**Client**](../client.md), &`'static` str)) -> Result<(), **String**>
+### - pub async fn [check](./response/check.md)(&self, `info`: ([**Client**](../client.md), &`'static` str)) -> Result<(), **String**>
