@@ -22,7 +22,7 @@ impl Client {
   /// Here we will save important information about your account.
   ///
   /// # _DO NOT SHARE THIS KEY WITH ANYONE!_
-  pub fn login(auth: &'static str) -> Self {
+  pub fn login(auth: &str) -> Self {
     let payments = Payments::call(format!("Bearer {auth}"));
     
     Self {
@@ -64,11 +64,14 @@ impl Payments {
   ///   payer_cpf: "12345678910".into()
   /// })).await;
   /// 
-  /// assert!(payment, Ok(Response::Pix({ 
-  ///   payment_id: 0, 
-  ///   qr_code: String::new(),
-  ///   literal: String::new()
-  /// }));
+  /// assert!(matches!(
+  ///   payment, 
+  ///   Ok(Response::Pix({ 
+  ///     payment_id: 0, 
+  ///     qr_code: String::new(),
+  ///     literal: String::new()
+  ///   })
+  /// ));
   /// ```
   pub async fn create(&self, data: PaymentCreate) -> Result<Response, String> {
     let client = reqwest::Client::new();

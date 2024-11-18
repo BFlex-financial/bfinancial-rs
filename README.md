@@ -1,6 +1,15 @@
 # bfinancial-rs
 
-# Gerando pagamentos via SDK
+## struct [Client](./docs/client.md) 
+
+# 
+
+<div align="center">
+  <h1>Exemplos de código</h1>
+</div>
+
+#
+
 ### Pix
 ```rs
 use tokio;
