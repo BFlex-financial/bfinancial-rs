@@ -5,7 +5,6 @@
 - struct [Client](./docs/client.md)
 
 <br>
-<br>
 <div align="center">
   <h1>Exemplos de código</h1>
 </div>
