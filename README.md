@@ -6,8 +6,8 @@
 
 <br>
 <div align="center">
-  <h5>Code Exemples in:</h5>
   <h4>
     <a href="./EXEMPLES-PT.md">Português</a> | English | 日本語
   </h4>
+  Select the one you prefer?
 </div>
