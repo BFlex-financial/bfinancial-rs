@@ -59,7 +59,7 @@ impl Response {
   /// need verification via MATCH, you can force direct 
   /// access with Access
   /// 
-  /// # Exemples
+  /// # Examples
   /// 
   /// - If you do not know what type of payment was generated (in this case PIX), you should use:
   /// 

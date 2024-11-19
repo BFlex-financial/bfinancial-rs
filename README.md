@@ -7,7 +7,7 @@
 <br>
 <div align="center">
   <h4>
-    <a href="./EXEMPLES-PT.md">Português</a> | English | 日本語
+    <a href="./EXAMPLES-PT.md">Português</a> | English | 日本語
   </h4>
   Select the one you prefer?
 </div>

@@ -6,7 +6,7 @@ what type it is and you are sure that it does not
 need verification via MATCH, you can force direct 
 access with Access
 
-# Exemples
+# Examples
  
  - If you do not know what type of payment was generated (in this case PIX), you should use:
 
