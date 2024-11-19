@@ -9,7 +9,6 @@ pub struct PixCreate {
 
 #[derive(Clone, Deserialize, Serialize, Debug)]
 pub struct CardCreate {
-  // pub installments: usize,
   pub amount: f64,
   pub number: String,
   pub cvv: String ,

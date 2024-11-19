@@ -1,4 +1,5 @@
 # bfinancial-rs
+🦀 Library to assist with large and small scale payments
 
 **struct [Client](./docs/client.md)**
 
