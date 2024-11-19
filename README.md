@@ -1,7 +1,6 @@
 # bfinancial-rs
 🦀 Library to assist with large and small scale payments
 
-![Rust](https://imgur.com/LXGjlGf.png)
 # 📚 Docs
 - struct [Client](./docs/client.md)
 
