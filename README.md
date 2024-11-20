@@ -1,4 +1,5 @@
-# bfinancial-rs
+<img align="right" src="https://imgur.com/EtCvGVc.png" height="85">
+
 🦀 Library to assist with large and small scale payments
 
 # 📚 Docs
