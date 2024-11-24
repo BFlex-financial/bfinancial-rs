@@ -7,10 +7,12 @@
 
 <br>
 <div align="center">
+
+  `Documentação` | `Documentation` | `Documentación`
   <h4>
-    <a href="./EXAMPLES-PT.md">Português</a> | 
-    <a href="./EXAMPLES-EN.md">English</a> | 
-    <a href="./EXAMPLES-ES.md">Español</a>
+    <a href="./DOCS-PT.md">Português</a> | 
+    <a href="./DOCS-EN.md">English</a> | 
+    <a href="./DOCS-ES.md">Español</a>
   </h4>
-  Select the one you prefer?
+  Selection of the language with the most content for the documentation
 </div>
