@@ -37,7 +37,7 @@ Para começar, adicione a biblioteca da BFlex ao seu projeto. No arquivo `cargo.
 
 ```toml
 [dependencies]
-bfinancial_rs = "*":
+bfinancial_rs = "*"
 ```
 
 Depois, utilize a SDK do **[🦀 Rust](https://rust-lang.org/)** para baixar a biblioteca. Isso pode ser feito com o comando:
