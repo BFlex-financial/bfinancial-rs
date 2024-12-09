@@ -31,6 +31,7 @@ pub struct Card {
 
 #[derive(PartialEq, Debug, Clone)]
 pub enum Response {
+  Checkout(String),
   Card(Card),
   Pix(Pix)
 }
@@ -46,6 +47,12 @@ impl RespData for Card {
 }
 
 impl RespData for Pix {
+  fn as_any(&self) -> &dyn Any {
+    self
+  }
+}
+
+impl RespData for String {
   fn as_any(&self) -> &dyn Any {
     self
   }
@@ -95,6 +102,7 @@ impl Response {
   /// ```
   pub fn access<T: 'static>(&self) -> Option<&T> {
     match self {
+      Response::Checkout(checkout) => checkout.as_any().downcast_ref::<T>(),
       Response::Card(card) => card.as_any().downcast_ref::<T>(),
       Response::Pix(pix) => pix.as_any().downcast_ref::<T>(),
     }
@@ -135,6 +143,7 @@ impl Response {
   /// ```
   pub async fn check(&self, info: (Client, &'static str)) -> Result<(), String> {
     let id: String = match self {
+      Response::Checkout(_) => unreachable!(),
       Response::Card(payment) => payment.payment_id.clone(),
       Response::Pix(payment) => payment.payment_id.clone()
     };
@@ -142,7 +151,7 @@ impl Response {
     let mut start: String = String::new();
 
     let client = reqwest::Client::new();
-    let res = client.get(format!("{}/payment/get", info.0.payments.__api.clone()))
+    let res = client.get(format!("{}/api/payment/get", info.0.payments.__api.clone()))
       .header("Authorization-key", info.0.payments.__auth.clone())
       .header("Content-Type", "application/json")
       .body(format!("{{\"payment_id\":{}}}", id))
@@ -163,7 +172,7 @@ impl Response {
     while rerun {
 
       let client = reqwest::Client::new();
-      let res = client.get(format!("{}/payment/get", info.0.payments.__api.clone()))
+      let res = client.get(format!("{}/api/payment/get", info.0.payments.__api.clone()))
         .header("Authorization-key", info.0.payments.__auth.clone())
         .header("Content-Type", "application/json")
         .body(format!("{{\"payment_id\":{}}}", id))

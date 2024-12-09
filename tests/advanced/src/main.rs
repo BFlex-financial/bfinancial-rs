@@ -1,29 +1,38 @@
 use tokio;
-use bfinancial_rs::{ models::{client::payment::{self, PaymentCreate}, server::payment::Pix}, Client};
+use bfinancial_rs::{ models::{client::{payment::{Checkout, PaymentCreate}, product::{Affiliation, Authorization, CatalogedProduct, CustomProduct, Product, ProductType}}, server::payment::Response}, Client};
 
 #[tokio::main]
 async fn main() {
     let client = Client::login("admin");
     let payments = &client.payments;
-    let payment_data = payments.create(PaymentCreate::Pix(payment::PixCreate {
-        amount: 0.02,
-        payer_email: "test@gmail.com".into(),
-        payer_cpf: "12345678910".into()
+
+    let payment: Result<Response, String> = payments.create(PaymentCreate::Checkout(Checkout {
+        single_use: true,
+        thumbnail: "https://img.jpg".into(),
+        amount: 1729.32,
+        title: "Teste".into(),
+        description: "Produto de teste".into(),
+        products: vec![
+            Product::Custom(CustomProduct {
+                description: "Produto A".into(),
+                price: 200.00,
+                thumbnail: "None".into(),
+                name: "Product A".into()
+            }),
+            Product::Custom(CustomProduct {
+                description: "MEU DEUS ME AJUDA FERNANDA FERNANDA FERNANDAFERNANDA SOCORRO".into(),
+                price: 300.00,
+                thumbnail: "None".into(),
+                name: "Product ".into()
+            }),
+        ]
     })).await;
 
-    if let Err(fail) = &payment_data {
-        println!("Error returned when generating payment: {}", fail);
+    if let Err(ref err) = payment {
+        println!("Error: {}", err);
+        return;
     }
 
-    let payment = payment_data.clone().unwrap();
-    let pix: &Pix = payment.access::<Pix>().unwrap();
-    println!("Pix copia e cola: {}", pix.literal);
-    let collected = payments.obtain(&pix.payment_id).await.unwrap();
-    println!("{:#?}", collected);
-    match
-        payment.check((client, "approved")).await
-    {
-        Ok(_) => println!("Payment approved"),
-        Err(msg) => println!("Ocurred a error: {msg}") 
-    }
+    let checkout: Response = payment.unwrap();
+    println!("URL: {}", checkout.access::<String>().unwrap());
 }

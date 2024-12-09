@@ -1,4 +1,5 @@
 use serde::{ Serialize, Deserialize };
+use crate::models::client::product::Product;
 
 #[derive(Clone, Deserialize, Serialize, Debug)]
 pub struct PixCreate {
@@ -20,8 +21,19 @@ pub struct CardCreate {
 }
 
 #[derive(Clone, Deserialize, Serialize, Debug)]
+pub struct Checkout {
+  pub amount: f64,
+  pub title: String,
+  pub thumbnail: String,
+  pub description: String,
+  pub single_use: bool,
+  pub products: Vec<Product>
+}
+
+#[derive(Clone, Deserialize, Serialize, Debug)]
 #[serde(tag = "method")]
 pub enum PaymentCreate {
+  Checkout(Checkout),
   Card(CardCreate),
   Pix(PixCreate)
 }

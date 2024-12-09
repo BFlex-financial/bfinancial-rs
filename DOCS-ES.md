@@ -21,10 +21,15 @@ Resumen
 
 **Facilidad de implementación del SDK**: todos nuestros SDK están diseñados para mantener una estructura consistente de identificadores y patrones de uso en diferentes lenguajes de programación. Esto proporciona una integración extremadamente intuitiva: incluso si no tienes un conocimiento profundo del lenguaje específico, podrás implementar el SDK con facilidad.
 
-**Interfaz de usuario de pago**: si su proyecto no requiere que el usuario permanezca en una plataforma específica y permite redireccionamientos, puede simplificar la implementación del lado del servidor simplemente redirigiendo al usuario a la URL de una página de pago oficial. de BFlex, asegurando una integración práctica y eficiente.
-
 **Facilidad de Obtener Resultados**: A diferencia de otras plataformas de pago, con BFlex puedes crear un pago usando tu método preferido con solo unas pocas líneas de código. Y lo mejor: todo ello de forma segura, sin necesidad de gestionar una comunicación directa con el consumidor.
 
+**Interfaz de usuario de pago**: si su proyecto no requiere que el usuario permanezca en una plataforma específica y permite redireccionamientos, puede simplificar la implementación del lado del servidor simplemente redirigiendo al usuario a la URL de una página de pago oficial. de BFlex, asegurando una integración práctica y eficiente.
+
+![Checkout page img](https://imgur.com/Y3o7FJ2.png)
+<div align="center">
+
+###### Imagen ilustrativa temporal
+</div>
 ## Instalación
 
 ### Requisitos

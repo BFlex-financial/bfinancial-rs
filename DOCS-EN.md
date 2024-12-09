@@ -20,9 +20,15 @@ Summary
 
 **Ease of SDK Implementation**: All of our SDKs are designed to maintain a consistent structure of identifiers and usage patterns across different programming languages. This provides an extremely intuitive integration: even if you do not have in-depth knowledge of the specific language, you will be able to implement the SDK with ease.
 
+**Ease of Obtaining Results**: Unlike other payment platforms, with BFlex you can create a payment using your preferred method with just a few lines of code. And the best: all this in a secure way, without the need to manage direct communication with the consumer.
+
 **Checkout User Interface**: If your project does not require the user to stay on a specific platform and allows redirects, you can simplify the server-side implementation by simply redirecting the user to an official checkout page URL. from BFlex, ensuring practical and efficient integration.
 
-**Ease of Obtaining Results**: Unlike other payment platforms, with BFlex you can create a payment using your preferred method with just a few lines of code. And the best: all this in a secure way, without the need to manage direct communication with the consumer.
+![Checkout page img](https://imgur.com/Y3o7FJ2.png)
+<div align="center">
+
+###### Placeholder image
+</div>
 
 ## Installation
 
