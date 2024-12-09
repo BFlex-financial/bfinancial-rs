@@ -26,10 +26,7 @@ Sumário
 **Interface de Usuário para Checkout**: Caso o seu projeto não exija que o usuário permaneça em uma plataforma específica e permita redirecionamentos, você pode simplificar a implementação no lado do servidor. Basta redirecionar o usuário para uma URL oficial da página de checkout da BFlex, garantindo uma integração prática e eficiente.
 
 ![Checkout page img](https://imgur.com/Y3o7FJ2.png)
-<div align="center">
 
-###### Imagem ilustrativa temporária
-</div>
 ## Instalação
 
 ### Requisitos

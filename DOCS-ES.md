@@ -26,10 +26,7 @@ Resumen
 **Interfaz de usuario de pago**: si su proyecto no requiere que el usuario permanezca en una plataforma específica y permite redireccionamientos, puede simplificar la implementación del lado del servidor simplemente redirigiendo al usuario a la URL de una página de pago oficial. de BFlex, asegurando una integración práctica y eficiente.
 
 ![Checkout page img](https://imgur.com/Y3o7FJ2.png)
-<div align="center">
 
-###### Imagen ilustrativa temporal
-</div>
 ## Instalación
 
 ### Requisitos

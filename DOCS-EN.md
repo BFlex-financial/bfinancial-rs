@@ -25,10 +25,6 @@ Summary
 **Checkout User Interface**: If your project does not require the user to stay on a specific platform and allows redirects, you can simplify the server-side implementation by simply redirecting the user to an official checkout page URL. from BFlex, ensuring practical and efficient integration.
 
 ![Checkout page img](https://imgur.com/Y3o7FJ2.png)
-<div align="center">
-
-###### Placeholder image
-</div>
 
 ## Installation
 
