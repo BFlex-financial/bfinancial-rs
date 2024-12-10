@@ -9,19 +9,19 @@ async fn main() {
     let payment: Result<Response, String> = payments.create(PaymentCreate::Checkout(Checkout {
         single_use: true,
         thumbnail: "https://img.jpg".into(),
-        amount: 1729.32,
+        amount: 300.00,
         title: "Teste".into(),
         description: "Produto de teste".into(),
         products: vec![
             Product::Custom(CustomProduct {
                 description: "Produto A".into(),
-                price: 200.00,
+                price: 100.00,
                 thumbnail: "None".into(),
                 name: "Product A".into()
             }),
             Product::Custom(CustomProduct {
                 description: "MEU DEUS ME AJUDA FERNANDA FERNANDA FERNANDAFERNANDA SOCORRO".into(),
-                price: 300.00,
+                price: 50.00,
                 thumbnail: "None".into(),
                 name: "Product ".into()
             }),
