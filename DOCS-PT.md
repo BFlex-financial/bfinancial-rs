@@ -96,7 +96,7 @@ Você pode ver a [📚 **Documentação** apertando aqui](https://bflex.tech/doc
 
 ## Exemplos
 
-  * [Criação de pagamentos](#gerando-pagamentos-com-pix)
+  * [Criação de pagamentos](#criação-de-pagamentos)
     * [Interface checkout para compras](#interface-de-compras-checkout) 
   * **Utilitário de pagamentos** 
     * [Coletando dados do pagamento](#coletando-dados-do-pagamento) 
@@ -113,7 +113,7 @@ O método create, recebe um `enum`, com os campos:
 pub enum PaymentCreate {
   Pix(PixCreate),
   Card(CardCreate),
-  Checkout(Checkout),
+  Checkout(Checkout)
 }
 ``` 
 
@@ -244,7 +244,7 @@ let payment: Result<Response, String> = payments.create(PaymentCreate::Checkout(
 })).await;
 ```
 
-> Assim como deu para ver, onde informamos para a API que o produto é público ou privado, é em caso de uma afiliação ser verdadeira. Você pode ter um exemplo de [Não afiliação, aqui](#protutos-catalogados-sem-afiliacao).
+> Assim como deu para ver, onde informamos para a API que o produto é público ou privado, é em caso de uma afiliação ser verdadeira. Você pode ter um exemplo de [Não afiliação, aqui](#protutos-catalogados-sem-afiliação).
 
 Para um **produto privado**, devemos ter antes um certificado vinculado a sua conta BFlex. Onde, este certificado,
 é o que configura a permissão de venda ou não. Este certificado, tem que ser emitido pelo vendedor do produto. E
