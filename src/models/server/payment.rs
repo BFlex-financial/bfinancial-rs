@@ -58,6 +58,12 @@ impl RespData for String {
   }
 }
 
+#[derive(Copy, PartialEq, Debug, Hash, Clone)]
+pub enum Verified<T> {
+  Fail(T),
+  Sucess
+}
+
 impl Response {
   /// # Access the payment
   ///
@@ -141,7 +147,9 @@ impl Response {
   ///   Err(msg) => println!("Ocurred a error: {msg}") 
   /// }
   /// ```
-  pub async fn check(&self, info: (Client, &'static str)) -> Result<(), String> {
+  pub async fn check(&self, info: (Client, &'static str)) -> Verified<String> {
+    use Verified::*;
+    
     let id: String = match self {
       Response::Checkout(_) => unreachable!(),
       Response::Card(payment) => payment.payment_id.clone(),
@@ -164,7 +172,7 @@ impl Response {
     if let Some(status) = response.get("data").and_then(|data| data.get("status")) {
       start = status.as_str().unwrap().to_string();
     } else {
-      return Err("Payment not found".into());
+      return Fail("Payment not found".into());
     }
 
     let mut rerun: bool = true;
@@ -183,12 +191,12 @@ impl Response {
       let response: Value = res.json::<Value>().await.unwrap();
 
       if let Some(error) = response.get("data").and_then(|data| data.get("error")) {
-        return Err(error.as_str().unwrap().to_string());
+        return Fail(error.as_str().unwrap().to_string());
       }
 
       if let Some(status) = response.get("data").and_then(|data| data.get("status")) {
         if status.as_str().unwrap() != start && status.as_str().unwrap() != info.1 {
-          return Err(format!("Received the '{}' status, but has expected '{}'.", status.as_str().unwrap(), info.1))
+          return Fail(format!("Received the '{}' status, but has expected '{}'.", status.as_str().unwrap(), info.1))
         }
 
         if status.as_str().unwrap() == info.1 {
@@ -200,7 +208,7 @@ impl Response {
 
     }
 
-    Ok(())
+    Sucess
 
   }
 }

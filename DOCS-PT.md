@@ -51,7 +51,7 @@ $ cargo install bfinancial_rs
 ## Vamos começar
 
 
-### 1. Configuração incial
+### 1. Configuração inicial
 
 Utilize a classe **Client** da SDK para realizar o login com sua **chave de API**. Após o login, você terá acesso à instância pré-configurada da classe Payments, que é retornada automaticamente pela classe **Client**.
 
@@ -98,7 +98,7 @@ Você pode ver a [📚 **Documentação** apertando aqui](https://bflex.tech/doc
 
   * [Criação de pagamentos](#criação-de-pagamentos)
     * [Interface checkout para compras](#interface-de-compras-checkout) 
-  * **Utilitário de pagamentos** 
+  * **Utilitários de pagamentos** 
     * [Coletando dados do pagamento](#coletando-dados-do-pagamento) 
     * [Verificação dos status em tempo real](#validação-de-status-em-tempo-real) 
 
@@ -134,7 +134,7 @@ fn main() {
   let payments = client.payments;
   let payment: Result<Response, String> = payments.create(PaymentCreate::Pix(PixCreate { ... })).await;
   
-  if let Err(err) = payment {
+  if let Err(err) = &payment {
     println!("Error: {err}");
     return;
   }
@@ -155,7 +155,7 @@ match payment {
 Certo, sabemos parsear então o erro, mas e a resposta?:
 
 A resposta pode ser parseada de formas diferentes, Caso você tenha usado o if, você pode abaixo dele simplesmente
-por um `.unwrap()`, já que de uma forma ou outra, o código só passa para baixo do if caso o pagamento tiver sido
+por um `.unwrap()`, já que de uma forma ou outra, o código só passa parabaixo do if caso o pagamento tiver sido
 criado com sucesso. Porém, agora temos um `enum`, nomeado como `Response` em nossas mãos. Para acessarmos os dados
 contidos dentro deste enumerador, podemos usar:
 
@@ -172,6 +172,10 @@ match data {
 Ou, se soubermos exatamente com o tipo de pagamento que estamos lidando 
 (Como um trecho de código que só roda quando estamos gerando um pagamento PIX),
 pode-se usar o método `access`:
+
+> [!TIP]
+> O acesso, em um pagamento `PIX`, e em um pagamento 
+`Card` são `struct`s. Enquanto o do Checkout, é de tipo `String`
 
 ```rust
 let data: Reponse = payment.unwrap();
@@ -200,8 +204,10 @@ todo o preço sobrelacente, vai para sua Wallet BFlex. Exemplo:
 TODOS os produtos estão em revenda, NENHUM é seu. o valor mínimo permitido no `amount` é **R$155,00**, para que
 pelo menos R$5,00 da venda sejam direcionados à sua Wallet.
 
-ou seja, no checkout, os protudos seriam exibidos com os respectivos preços: `R$103,33` `R$51,66`  
+ou seja, no checkout, os produtos seriam exibidos com os respectivos preços: `R$103,33` `R$51,66`  
+
 Pois, foi inflado o valor do lucro de forma proporcional em cada um. 
+
 Se os mesmos produtos, fossem vendidos a **R$300,00**, os exatos mesmos produtos teriam
 os respectivos preços: `R$200,00` `R$100,00`. tendo você então, **100%** de
 lucro em cima dos produtos.
@@ -230,7 +236,7 @@ públicos e produtos privados. Produtos públicos, cujo qualquer pessoa pode ven
 - Um produto custa **R$1.000,00**, você pretende vendê-lo. Você deve cobrar mais que R$1.000,00 no produto, para 
 que o valor do produto vá para o fornecedor, e sua margem de lucro vá para você. A margem de lucro, deve-se ser definida na diferença de valores do campo `amount` e do produto.
 
-No exemplo a baixo, estaremos com **R$200,00** de lucro encima de algum **produto público** de R$1.000,00:
+No exemplo abaixo, estaremos com **R$200,00** de lucro em cima de algum **produto público** de R$1.000,00:
 
 ```rust
 let payment: Result<Response, String> = payments.create(PaymentCreate::Checkout(Checkout {
@@ -250,7 +256,7 @@ Para um **produto privado**, devemos ter antes um certificado vinculado a sua co
 é o que configura a permissão de venda ou não. Este certificado, tem que ser emitido pelo vendedor do produto. E
 de alguma forma, repassado à você.
 
-No exemplo a baixo, estaremos com **R$200,00** de lucro encima de algum **produto privado** de R$1.000,00:
+No exemplo abaixo, estaremos com **R$200,00** de lucro em cima de algum **produto privado** de R$1.000,00:
 
 ```rust
 let payment: Result<Response, String> = payments.create(PaymentCreate::Checkout(Checkout {
@@ -266,7 +272,7 @@ let payment: Result<Response, String> = payments.create(PaymentCreate::Checkout(
 })).await;
 ```
 
-### Protutos catalogados (Sem afiliação)
+### Produtos catalogados (Sem afiliação)
 
 Os produtos sem afiliação, são produtos pré-criados de sua autoria. Onde não se precisa de nada mais do que o ID
 no objeto e a definição de `affiliation` como `Affiliation::No`.
@@ -276,97 +282,57 @@ obrigatóriamente cobrados, pois você sabe o preço que quer vender seu produto
 
 ### Coletando dados do pagamento
 
-```rust
-use tokio;
-use bfinancial_rs::{ models::{client::payment::{self, PaymentCreate}, server::payment::Pix}, Client};
+Os dados dos pagamentos são protegidos, e acessíveis apenas com a chave de API do criador do pagamento. 
+As resposta de erro possíveis para falhas de coleta de pagamentos, são:
 
-#[tokio::main]
-async fn main() {
-  let client = Client::login("YOUR_API_KEY");
-  let payments = client.payments;
-  let payment_data = payments.create(PaymentCreate::Pix(payment::PixCreate {
-    payer_email: "test@gmail.com".into(),
-    payer_cpf:   "12345678909".into()
-    amount:       1000.0,
-  })).await;
+- `Payment not found • 404`: O pagamento de ID `x` 
+(Informado como primeiro argumento no métedo `obtain`) 
+não existe ou simplesmente não foi encontrado.
 
-  if let Err(fail) = &payment_data {
-    println!("Error returned when generating payment: {}", fail);
-  }
+- `Unauthorized access • 401`: O pagamento de ID `x` 
+(Informado como primeiro argumento no métedo `obtain`) 
+foi encontrado, porém o autor da criação do pagamento 
+não é você.
 
-  let payment = payment_data.clone().unwrap();
-  let pix: &Pix = payment.access::<Pix>().unwrap();
-  let collected = payments.obtain(&pix.payment_id).await.unwrap();
-  println!("{:#?}", collected);
-}
-```
-
-Ou, caso você não saiba o tipo exato de pagamento com que está lidando, você pode usar:
+No exemplo abaixo, deduz-se que você tenha um pagamento em formato `PIX` já antes criado,
+e você por algum motivo, deseja coletar os dados do pagamento, 
+como: Status; Informações do QRCode; 
 
 ```rust
-use tokio;
-use bfinancial_rs::{ models::{client::payment::{self, PaymentCreate}, server::payment::{Response, Pix}}, Client};
-
-#[tokio::main]
-async fn main() {
-  let client = Client::login("YOUR_API_KEY");
-  let payments = client.payments;
-  let payment_data = payments.create(PaymentCreate::Pix(payment::PixCreate {
-    payer_email: "test@gmail.com".into(),
-    payer_cpf:   "12345678909".into()
-    amount:       1000.0,
-  })).await;
-
-  if let Err(fail) = &payment_data {
-    println!("Error returned when generating payment: {}", fail);
-  }
-
-  let payment = payment_data.clone().unwrap();
-
-  match payment {
-    Response::Card(card) => {
-      let collected = payments.obtain(&card.payment_id).await.unwrap()
-      println!("{:#?}", collected);
-    }
-
-    Response::Pix(pix) => {
-      let collected = payments.obtain(&pix.payment_id).await.unwrap()
-      println!("{:#?}", collected);
-    }
-  }
-  
-}
+let pix: &Pix = payment.access::<Pix>().unwrap();
+let collected = payments.obtain(&pix.payment_id).await.unwrap();
 ```
 
 ### Validação de Status em tempo real
 
-Com isto, você pode aguardar o recebimento de um Status, e saber se foi recebido ele, ou outro.
+Com o método `check`, você pode verificar o status de um pagamento, verificar se ele está pendente, se foi pago...
+Porém, em caso de Sucesso, o a resposta vem como um `Option` invertido. Nomeamos por aqui como: `Verified<String>` 
+
+> [!TIP]
+> Importe _Verified_ com `Verified::{self, *}`
 
 ```rust
-use tokio;
-use bfinancial_rs::{ models::{client::payment::{self, PaymentCreate}, server::payment::Pix}, Client};
-
-#[tokio::main]
-async fn main() {
-  let client = Client::login("YOUR_API_KEY");
-  let payments = &client.payments;
-  let payment_data = payments.create(PaymentCreate::Pix(payment::PixCreate {
-    payer_email: "test@gmail.com".into(),
-    payer_cpf:   "12345678909".into()
-    amount:       1000.0,
-  })).await;
-
-  if let Err(fail) = &payment_data {
-    println!("Error returned when generating payment: {}", fail);
-  }
-
-  let payment = payment_data.unwrap();
-  match
-    payment.check((client, "approved")).await
-  {
-    Ok(_) => println!("Payment approved"),
-    Err(msg) => println!("Ocurred a error: {msg}") 
-  }
+match
+  payment.check((client, "approved")).await
+{
+  Sucess => println!("Payment approved"),
+  Fail(msg) => println!("Ocurred a error: {msg}") 
 }
 ```
 
+Se você não quer aguardar o pagamento ter alguma alteração no pagamento, você pode abrir uma thread, e usar o
+check em uma segunda thread.
+
+Você pode fazer isto usando a própria lib padrão do Rust de threads, e usar o mpsc para abrir um canal 
+de comunicação entre a thread e o código principal (Dica, porém opcional). Assim, como neste exemplo:
+
+```rust
+thread::spawn(move || {
+  match
+    payment.check((client, "approved")).await
+  {
+    Sucess => println!("Payment approved"),
+    Fail(msg) => println!("Ocurred a error: {msg}")
+  }
+});
+```
