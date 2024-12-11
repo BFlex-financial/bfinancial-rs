@@ -62,13 +62,13 @@ use bfinancial_rs::Client;
 #[tokio::main]
 async fn main() {
   let client = Client::login("YOUR_API_KEY");
-  let payments = client.payments;al payments = client.payments;
+  let payments = client.payments;
 }
 ```
 
 ### 2. Realize seu primeiro pagamento!
 
-Experimente a integração realizando um pagamento de teste no valor de 1 **BRL**. O montante será creditado em sua conta **BFlex** por meio de um **Pix** gerado automaticamente pela SDK!
+Experimente a integração realizando um pagamento de teste no valor de **R$1.00**. O montante será creditado em sua conta **BFlex** por meio de um **Pix** gerado automaticamente pela SDK!
 
 ```rust
 use tokio;
@@ -105,9 +105,9 @@ Você pode ver a [📚 **Documentação** apertando aqui](https://bflex.tech/doc
 ## Criação de pagamentos
 
 Para criar um pagamento, coletamos a instância de pagamentos recebida após o
-login na API via SDK, e usamos o método `create`, existente lá dentro. 
+login na API via SDK, e usamos o método `create`, lá presente. 
 
-O método create, recebe um `enum`, com os campos:
+O método `create`, recebe um `enum`, com os campos:
 
 ```rust
 pub enum PaymentCreate {
@@ -175,7 +175,7 @@ pode-se usar o método `access`:
 
 > [!TIP]
 > O acesso, em um pagamento `PIX`, e em um pagamento 
-`Card` são `struct`s. Enquanto o do Checkout, é de tipo `String`
+`Card` são `struct's`. Enquanto o do Checkout, é de tipo `String`
 
 ```rust
 let data: Reponse = payment.unwrap();
@@ -190,7 +190,7 @@ informações básicas do pagamento, o Checkout tem mais complexidades, e alguns
 
 A `struct` _Checkout_, contém alguns alguns campos especiais, como o campo `amount` e `products`.
 
-- **Amount**: O campo `amount`, por mais que existente em todas as `struct`s, aqui tem um funcionamento especial.
+- **Amount**: O campo `amount`, por mais que existente em todas as `struct's`, aqui tem um funcionamento especial.
 sendo ele:
 
 Os [Produtos catalogados](#produtos-catalogados) (Com afiliação), são sempre cobrados. Explicando melhor, se você 
@@ -206,7 +206,7 @@ pelo menos R$5,00 da venda sejam direcionados à sua Wallet.
 
 ou seja, no checkout, os produtos seriam exibidos com os respectivos preços: `R$103,33` `R$51,66`  
 
-Pois, foi inflado o valor do lucro de forma proporcional em cada um. 
+Pois foi inflado o valor do lucro de forma proporcional em cada um. 
 
 Se os mesmos produtos, fossem vendidos a **R$300,00**, os exatos mesmos produtos teriam
 os respectivos preços: `R$200,00` `R$100,00`. tendo você então, **100%** de
@@ -230,8 +230,8 @@ quer dizer que o produto pertence à ti. Onde a resposabilidade de controle do p
 
 ### Produtos catalogados
 
-Produtos catalogados são produtos já pré-criados no painel de produtos da BFlex. Porém, na BFlex, existem produtos
-públicos e produtos privados. Produtos públicos, cujo qualquer pessoa pode vender, cobrando margem de lucro sobre o preço do produto. Exemplo: 
+Produtos catalogados são produtos já pré-criados no painel de produtos da BFlex. Porém na BFlex existem produtos
+públicos e produtos privados. Produtos públicos,cujos qualquer pessoa pode vender, cobrando margem de lucro sobre o preço do produto. Exemplo: 
 
 - Um produto custa **R$1.000,00**, você pretende vendê-lo. Você deve cobrar mais que R$1.000,00 no produto, para 
 que o valor do produto vá para o fornecedor, e sua margem de lucro vá para você. A margem de lucro, deve-se ser definida na diferença de valores do campo `amount` e do produto.
@@ -250,7 +250,7 @@ let payment: Result<Response, String> = payments.create(PaymentCreate::Checkout(
 })).await;
 ```
 
-> Assim como deu para ver, onde informamos para a API que o produto é público ou privado, é em caso de uma afiliação ser verdadeira. Você pode ter um exemplo de [Não afiliação, aqui](#protutos-catalogados-sem-afiliação).
+> Como se demonstra, onde informamos para a API que o produto é público ou privado, é em caso de uma afiliação ser verdadeira. Você pode ter um exemplo de [Não afiliação, aqui](#protutos-catalogados-sem-afiliação).
 
 Para um **produto privado**, devemos ter antes um certificado vinculado a sua conta BFlex. Onde, este certificado,
 é o que configura a permissão de venda ou não. Este certificado, tem que ser emitido pelo vendedor do produto. E
@@ -274,11 +274,11 @@ let payment: Result<Response, String> = payments.create(PaymentCreate::Checkout(
 
 ### Produtos catalogados (Sem afiliação)
 
-Os produtos sem afiliação, são produtos pré-criados de sua autoria. Onde não se precisa de nada mais do que o ID
+Os produtos sem afiliação, são produtos pré-criações de sua propriaautoria. Onde não se precisa de nada mais do que o ID
 no objeto e a definição de `affiliation` como `Affiliation::No`.
 
 E assim como os produtos customizados, é 100% de responsabilidade sua o preço final do checkout. Não são 
-obrigatóriamente cobrados, pois você sabe o preço que quer vender seu produto, nem que seja por R$0,01 centavo.
+obrigatóriamente cobrados, pois você sabe o preço que quer vender seu produto, nem que seja por R$0,01.
 
 ### Coletando dados do pagamento
 
