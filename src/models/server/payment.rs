@@ -61,7 +61,7 @@ impl RespData for String {
 #[derive(Copy, PartialEq, Debug, Hash, Clone)]
 pub enum Verified<T> {
   Fail(T),
-  Sucess
+  Success
 }
 
 impl Response {
@@ -208,7 +208,7 @@ impl Response {
 
     }
 
-    Sucess
+    Success
 
   }
 }

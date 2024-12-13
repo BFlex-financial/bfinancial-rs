@@ -315,7 +315,7 @@ Porém, em caso de Sucesso, o a resposta vem como um `Option` invertido. Nomeamo
 match
   payment.check((client, "approved")).await
 {
-  Sucess => println!("Payment approved"),
+  Success => println!("Payment approved"),
   Fail(msg) => println!("Ocurred a error: {msg}") 
 }
 ```
@@ -331,7 +331,7 @@ thread::spawn(move || {
   match
     payment.check((client, "approved")).await
   {
-    Sucess => println!("Payment approved"),
+    Success => println!("Payment approved"),
     Fail(msg) => println!("Ocurred a error: {msg}")
   }
 });
