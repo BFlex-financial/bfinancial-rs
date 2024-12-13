@@ -62,7 +62,7 @@ use bfinancial_rs::Client;
 #[tokio::main]
 async fn main() {
   let client = Client::login("YOUR_API_KEY");
-  let payments = client.payments;al payments = client.payments;
+  let payments = client.payments;
 }
 ```
 

@@ -62,7 +62,7 @@ use bfinancial_rs::Client;
 #[tokio::main]
 async fn main() {
   let client = Client::login("YOUR_API_KEY");
-  let payments = client.payments;al payments = client.payments;
+  let payments = client.payments;
 }
 ```
 
@@ -266,8 +266,8 @@ En el siguiente ejemplo, tendremos **$200,00** de ganancia además de algún **p
 ```rust
 let payment: Result<Response, String> = payments.create(PaymentCreate::Checkout(Checkout {
   amount: 1200.00,
-  products: vec![
-    Product::Caloged(CatalogedProduct {
+  products: vec;
+Caloged(CatalogedProduct {
       product_id: "R$1.000,00 product ID".into(),
       affiliation: Affiliation::Yes(ProductType::Private(
         Authorization::cert("Certificate of permission to resell the product.")
